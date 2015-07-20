@@ -1,12 +1,14 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <string>
 #include <linux/videodev2.h>
 #include <poll.h>
 #include <unistd.h>
+#include "memory.h"
 
 #define MFC_DEVICE "/dev/video6"
 #define COMPRESSED_BUFFER_CNT 3
@@ -73,7 +75,7 @@ void DecodeSomeFrames()
 
 }
 
-Close()
+void Close()
 {
 
 }
