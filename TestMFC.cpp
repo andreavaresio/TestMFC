@@ -9,6 +9,7 @@
 #include <poll.h>
 #include <unistd.h>
 #include "memory.h"
+#include "stdio.h"
 
 #define MFC_DEVICE "/dev/video6"
 #define COMPRESSED_BUFFER_CNT 3
@@ -77,6 +78,14 @@ void DecodeSomeFrames()
 
 void Close()
 {
+	for (int i = 0; i < m_NCompressedBuffers; i++)
+	{
+		if (m_CompressedBufferMMapAddres[i])
+		{
+			munmap(m_CompressedBufferMMapAddres[i], m_CompressedBufferMemoryLength[i]);
+		}
+	}
+
 	int retval = close(m_FileDescriptor);
 	printf ("[CMfc::Close] close=%d\n", retval);
 }
@@ -89,5 +98,7 @@ int main(int argc, char **argv)
 
 	Close();
 
+	printf ("type enter\n");
+	getchar();
 	return 0;
 }
