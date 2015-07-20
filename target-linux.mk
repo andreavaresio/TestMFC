@@ -8,7 +8,7 @@
 #----------------------------------------------
 
 ifeq ($(CFG),)
-CFG=Debug
+CFG=Release
 PRINTCFG = No configuration specified. Defaulting to $(CFG) 
 endif 
 ifneq ($(CFG),Release)
@@ -28,16 +28,19 @@ endif
 endif
 
 ifeq ($(PLATFORM),)
-PLATFORM=LINUX
+PLATFORM=ODROID
 PRINTCFG = No platform specified. Defaulting to $(PLATFORM) 
 endif 
 ifneq ($(PLATFORM),LINUX)
 ifneq ($(PLATFORM),RASPBERRY)
+ifneq ($(PLATFORM),ODROID)
 error:
 	@echo "ERROR An invalid platform is specified."
 	@echo " Possible choices for configuration are:"
 	@echo "  LINUX"
 	@echo "  RASPBERRY"
+	@echo "  ODROID"
+endif
 endif
 endif
 
@@ -65,11 +68,18 @@ AR = ar
 CPP_FLAGS += 
 endif
 
+ifeq ($(PLATFORM),ODROID)
+#percorso del cross-compilatore
+CPP = g++
+CPP_C = gcc
+AR = ar
+CPP_FLAGS += 
+endif
 #================================================================================================
 # RELEASE
 #================================================================================================
 ifeq ($(CFG),Release)
-CPP_FLAGS += -O3 -DNDEBUG
+CPP_FLAGS += -O3 -g -DNDEBUG
 LD_FLAGS += -Wl,-s
 
 #================================================================================================
@@ -131,9 +141,9 @@ $(OBJDIR)/%.o : %.cpp
 	@mkdir -p $(TARGETDIR)
 	@echo Making $@...
 ifeq ($(GCC_MAJOR),3)
-		@$(CPP) -c -MF $(OBJDIR)/$*.d.tmp -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
+		$(CPP) -c -MF $(OBJDIR)/$*.d.tmp -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
 else
-		@$(CPP) -c -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
+		$(CPP) -c -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
 		@mv -f $(OBJDIR)/$*.d $(OBJDIR)/$*.d.tmp
 endif
 	@set -e; cat $(OBJDIR)/$*.d.tmp | sed 's!\($(*F)\)\.o[ :]*!\1.o $(OBJDIR)/$*.d : !g' > $(OBJDIR)/$*.d; [ -s $(OBJDIR)/$*.d ] || rm -f $(OBJDIR)/$*.d
@@ -144,9 +154,9 @@ $(OBJDIR)/%.o : %.c
 	@mkdir -p $(TARGETDIR)
 	@echo Making $@...
 ifeq ($(GCC_MAJOR),3)
-		@$(CPP_C) -c -MF $(OBJDIR)/$*.d.tmp -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
+		$(CPP_C) -c -MF $(OBJDIR)/$*.d.tmp -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
 else
-		@$(CPP_C) -c -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
+		$(CPP_C) -c -MMD $(CPP_FLAGS) $(CPP_FLAGS_CONFIG) $(INCLUDE) -o $@ $<
 		@mv -f $(OBJDIR)/$*.d $(OBJDIR)/$*.d.tmp
 endif
 	@set -e; cat $(OBJDIR)/$*.d.tmp | sed 's!\($(*F)\)\.o[ :]*!\1.o $(OBJDIR)/$*.d : !g' > $(OBJDIR)/$*.d; [ -s $(OBJDIR)/$*.d ] || rm -f $(OBJDIR)/$*.d
