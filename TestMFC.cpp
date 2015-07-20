@@ -77,7 +77,8 @@ void DecodeSomeFrames()
 
 void Close()
 {
-
+	int retval = close(m_FileDescriptor);
+	printf ("[CMfc::Close] close=%d\n", retval);
 }
 
 int main(int argc, char **argv)
