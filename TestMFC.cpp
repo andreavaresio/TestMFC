@@ -28,6 +28,7 @@ bool m_CompressedBufferDequeued[MFC_MAX_COMPRESSED_BUF];
 
 void Open()
 {
+	int ret;
 	m_FileDescriptor = open(MFC_DEVICE, O_RDWR | O_NONBLOCK, 0); MyAssert(m_FileDescriptor > 0);
 
 	struct v4l2_format fmt;
@@ -65,7 +66,6 @@ void Open()
 		m_CompressedBufferMMapAddres[n] = (unsigned char*)mmap(NULL, buf.m.planes[0].length, PROT_READ | PROT_WRITE, MAP_SHARED, m_FileDescriptor, buf.m.planes[0].m.mem_offset); MyAssert(m_CompressedBufferMMapAddres[n] != MAP_FAILED);
 		m_CompressedBufferDequeued[n] = true;
 	}
-....
 }
 
 void DecodeSomeFrames()
